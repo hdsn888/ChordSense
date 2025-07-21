@@ -23,13 +23,12 @@ con.connect(function(err) {
     console.log("Connected!");
 })
 
-app.get('/chords/:chordName', (req, res) => {
+app.get('/chords', (req, res) => {
     console.log("Request received");
     const chord = req.params.chordName;
-    const sql = `SELECT Link FROM chords
-            WHERE Concert_Pitch = ?`;
+    const sql = `SELECT * FROM Chords`;
     console.log("About to query")
-    con.query(sql, [chord], function(err, result) {
+    con.query(sql, function(err, result) {
         if (err) {
             res.status(500).json({error: "Database error"});
             return;
