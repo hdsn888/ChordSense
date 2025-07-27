@@ -2,18 +2,15 @@ import { useState, useEffect} from 'react'
 import axios from 'axios';
 import "./style.css";
 import * as Tone from "tone";
-// const apiCall = async () => {
-//  try {
-//   await axios.get('http://localhost:3001/');
-//   console.log("apiCall is functioning");
-//   return 0;
-//  } catch (error) {
-//     console.log(error);
-//     return 1;
-//  }
-// }
 
-// const urls = {"C4": "C4.mp3", "E4": "E4.mp3", "G4": "G4.mp3"};
+
+// sampler used for all chords
+const sampler = new Tone.Sampler({
+    urls: {"C4": "C4.mp3", "E4": "E4.mp3", "G4": "G4.mp3", "B4": "B4.mp3"},
+    release: 1,
+    baseUrl: "/",
+})
+sampler.toDestination();
 
 // chords are queried and fetched from backend
 const getChords = async() => {
@@ -21,33 +18,76 @@ const getChords = async() => {
     console.log("About to send request and fetch response");
     const promise  = await fetch("http://localhost:3001/chords");
     console.log("Promise received");
-    // if (!promise.ok) {
-    //   throw new Error("");
-    // }
     const chords = await promise.json();
     return chords;
-    // console.log(chords[0].Link);
-    // const audio = new Audio (chords[0].Link);
-    // audio.play();
   } catch (error) {
     console.log(error);
     return ([{error: "Chords fetching failed"}]);
   }
 }
 
-const playMusic = (chords) => {
-    // console.log(chords[0].Link);
-    // const audio = new Audio (chords[0].Link);
-    // audio.play();
-    const sampler = new Tone.Sampler({
-      urls: {"C4": "C4.mp3", "E4": "E4.mp3", "G4": "G4.mp3", "B4": "B4.mp3"},
-      release: 1,
-      baseUrl: "../public/",
-    }).toDestination();
+// Plays specified chord
+const playChord = async ({chords, chord}) => {
+  sampler.triggerAttackRelease(chords.get(chord).notes, 2.5);
+}
 
-    Tone.loaded().then(() => {
-      sampler.triggerAttackRelease(chords.get("C7").notes);
-    });
+// Plays specified note
+const playNote = async (note) => {
+  sampler.triggerAttackRelease(note, 2.5);
+}
+
+//Sets buttons to correct chord
+const ChordButtons = ({chords, chord}) => {
+  return (
+    <div className = "flex flex-row shrink-0" >
+      {chords.get(chord).notes.map((note) => (
+        <div key = {note} className = "w-40 m-2">
+          <button className = "object-cover btn-sm" onClick = {() => playNote(note)}>
+            <img src = {`/${note}.png`} className = "w-40 h-20" />
+          </button>
+            <p className = "p-5">{note}</p>
+        </div>
+      ))}
+      <div className = "w-40 m-2">
+        <button className = "object-cover btn-sm" onClick = {() => playChord({chords, chord})}>
+          <img src = {`/${chord}.png`} className = "w-40 h-20" />
+        </button>
+          <p className = "p-5">{chord}</p>
+      </div>
+      
+    </div>
+  );
+}
+
+// remember to pass all parent states as props to children
+// [...chords] - destructuring, converting map to array
+// awaits tone within dropdown to decrease tone delay when a note / button is pressed
+
+const ChordDropdown = ({setIsShowing, setCurrChord, chords}) => {
+
+  useEffect (() => {
+    setIsShowing(true);
+  }, []); 
+
+  return (
+    <div>
+      <div className = "dropdown dropdown-bottom ">
+      <div tabIndex = {0} role = "button" className = "p-6 w-xs btn btn-soft ">
+        Chords
+      </div>
+      <ul tabIndex = {0} className = "dropdown-content menu bg-base-100 rounded-box z-1 w-40 p-1 shadow-sm">
+        {[...chords].map(([chord_name, notes]) => (
+          <li key = {chord_name}><a onClick = {async () => {
+            setCurrChord(chord_name);
+            await Tone.start();
+            }}>
+            {chord_name}
+          </a></li>
+        ))}
+      </ul> 
+      </div>
+    </div>
+  );
 }
 
 function MyButton({count, onClick}) {
@@ -70,14 +110,12 @@ function Header() {
   );
 }
 
-// function ChordList() {
-//   let listChords = chords.map(chord => <li key = {chord.id}> {chord.name} </li>);
-//   return <ul>{listChords}</ul>;
-// }
-
 export default function App() { // file can only have one default export
   const [chords, setChords] = useState([]); //hook
   const [isReady, setIsReady] = useState(false);
+  const [isShowing, setIsShowing] = useState(false);
+  const [currChord, setCurrChord] = useState(null);
+
 
   useEffect(() => {
     const fetchChords = async () => {
@@ -94,8 +132,6 @@ export default function App() { // file can only have one default export
     fetchChords();
   }, []);
 
-
-
   // props - information passed from its parent component
   return (
     <div className = "grid grid-cols-8 gap-4 items-center content-center">
@@ -110,19 +146,15 @@ export default function App() { // file can only have one default export
           <li><a>Contact</a></li>
         </ul>
       </div>
-      {/* <ChordList /> */}
-      {/*<MyButton count = {count} onClick = {handleClick} />*/}
-      {isReady && <div className = "dropdown dropdown-bottom">
-      <div tabIndex = {0} role = "button" className = "btn btn-soft col-start-4 col-span-2">Chords</div>
-        <ul tabIndex = {0} className = "dropdown-content menu bg-base-100 rounded-box z-1 w-40 p-1 shadow-sm">
-          <li><a onClick = {() => playMusic(chords)}>CMaj7</a></li>
-          <li><a>C7</a></li>
-          <li><a>Cm7</a></li>
-        </ul> 
-      </div>}
-      {/* <button>
-        <img src = "/CMaj.png" alt = "CMaj chord"/>
-      </button> */}
+      <div className = "col-start-4 col-span-2 m-10" >
+        {isReady && <ChordDropdown setIsShowing = {setIsShowing} 
+        setCurrChord = {setCurrChord} chords = {chords}/> 
+        }
+      </div>
+      <div className = "col-start-4 col-span-4">
+       
+        {isShowing && currChord && <ChordButtons chords = {chords} chord = {currChord} />}
+      </div>
 
     </div>
   );
