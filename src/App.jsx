@@ -6,7 +6,8 @@ import * as Tone from "tone";
 
 // sampler used for all chords
 const sampler = new Tone.Sampler({
-    urls: {"C4": "C4.mp3", "E4": "E4.mp3", "G4": "G4.mp3", "B4": "B4.mp3"},
+    urls: {"C4": "C4.mp3", "E4": "E4.mp3", "G4": "G4.mp3", "B4": "B4.mp3", 
+      "C5": "C5.mp3", "B5": "B5.mp3", "E5": "E5.mp3", "G5": "G5.mp3"},
     release: 1,
     baseUrl: "/",
 })
@@ -43,14 +44,14 @@ const ChordButtons = ({chords, chord}) => {
       {chords.get(chord).notes.map((note) => (
         <div key = {note} className = "w-40 m-2">
           <button className = "object-cover btn-sm" onClick = {() => playNote(note)}>
-            <img src = {`/${note}.png`} className = "w-40 h-20" />
+            <img src = {`/${note}.png`} className = "w-32 h-20" />  {/* w-32 h-20*/}
           </button>
             <p className = "p-5">{note}</p>
         </div>
       ))}
       <div className = "w-40 m-2">
         <button className = "object-cover btn-sm" onClick = {() => playChord({chords, chord})}>
-          <img src = {`/${chord}.png`} className = "w-40 h-20" />
+          <img src = {`/${chord}.png`} className = "w-36 h-20" />
         </button>
           <p className = "p-5">{chord}</p>
       </div>
@@ -63,6 +64,33 @@ const ChordButtons = ({chords, chord}) => {
 // [...chords] - destructuring, converting map to array
 // awaits tone within dropdown to decrease tone delay when a note / button is pressed
 
+const RootDropdown = ({setIsShowing, setCurrChord, chords}) => {
+
+  useEffect (() => {
+    setIsShowing(true);
+  }, []); 
+
+  return (
+    <div>
+      <div className = "dropdown dropdown-bottom ">
+      <div tabIndex = {0} role = "button" className = "p-6 w-xs btn btn-soft ">
+        Chord
+      </div>
+      <ul tabIndex = {0} className = "dropdown-content menu bg-base-100 rounded-box z-1 w-40 p-1 shadow-sm">
+        {[...chords].map(([chord_name, notes]) => (
+          <li key = {chord_name}><a onClick = {async () => {
+            setCurrChord(chord_name);
+            await Tone.start();
+            }}>
+            {chord_name}
+          </a></li>
+        ))}
+      </ul> 
+      </div>
+    </div>
+  );
+}
+
 const ChordDropdown = ({setIsShowing, setCurrChord, chords}) => {
 
   useEffect (() => {
@@ -73,7 +101,7 @@ const ChordDropdown = ({setIsShowing, setCurrChord, chords}) => {
     <div>
       <div className = "dropdown dropdown-bottom ">
       <div tabIndex = {0} role = "button" className = "p-6 w-xs btn btn-soft ">
-        Chords
+        Chord
       </div>
       <ul tabIndex = {0} className = "dropdown-content menu bg-base-100 rounded-box z-1 w-40 p-1 shadow-sm">
         {[...chords].map(([chord_name, notes]) => (
@@ -147,7 +175,7 @@ export default function App() { // file can only have one default export
         </ul>
       </div>
       <div className = "col-start-4 col-span-2 m-10" >
-        {isReady && <ChordDropdown setIsShowing = {setIsShowing} 
+        {isReady && <RootDropdown setIsShowing = {setIsShowing} 
         setCurrChord = {setCurrChord} chords = {chords}/> 
         }
       </div>

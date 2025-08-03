@@ -10,6 +10,17 @@ app.use(cors( {
     credentials: true
 }));
 
+const server = app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`);
+})
+
+process.on('SIGINT', () => {
+    server.close(() => {
+        console.log("\nProcess ended");
+        process.exit();
+    });
+});
+
 let con = mysql.createConnection ({
     host: "localhost",
     port: 3306,
@@ -51,8 +62,4 @@ app.get('/chords', (req, res) => {
 
 app.get('/', (req, res) => {
     res.send("Hello World!")
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`);
 })
