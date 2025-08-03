@@ -143,6 +143,7 @@ export default function App() { // file can only have one default export
   const [isReady, setIsReady] = useState(false);
   const [isShowing, setIsShowing] = useState(false);
   const [currChord, setCurrChord] = useState(null);
+  const [noteColor, setNoteColor] = useState("#000000ff");
 
 
   useEffect(() => {
@@ -182,6 +183,45 @@ export default function App() { // file can only have one default export
       <div className = "col-start-4 col-span-4">
        
         {isShowing && currChord && <ChordButtons chords = {chords} chord = {currChord} />}
+        <svg width = "500" height = "200" viewBox = "-250 -100 500 200">
+          <rect
+            x = "-250"
+            y = "-100"
+            width = "500"
+            height="100"
+            fill = "#f6f6f6ff"
+          />
+          <path d = " M -250 -83 L 250 -83 M -250 -72 L 250 -72 M -250 -61 L 250 -61 M -250 -50 L 250 -50 M -250 -39 L 250 -39 "
+          stroke = "#000000ff"
+          />
+           <svg x="-250" y="-100" width="100" height="100" viewBox="-50 -50 100 100" 
+          onClick={() => playNote("A4")} onMouseEnter = {() => setNoteColor("#d02323ff")} onMouseLeave = {() => setNoteColor("#000000ff")}>
+            <rect x="-50" y="-50" width="100" height="100" fill="transparent" />
+            <ellipse rx="15" ry="9.5" cx="10" cy="10" transform="rotate(-26)" fill={noteColor}/>
+            <path
+              d = "M 25.75 4 L 25.75 -50"
+              stroke={noteColor}
+              stroke-width="2.5"
+            />
+          </svg>
+          {/* <svg x="100" y="100" width="100" height="100" viewBox="-50 -50 100 100" 
+          onClick={() => playNote("A4")} onMouseEnter = {() => setNoteColor("#d02323ff")} onMouseLeave = {() => setNoteColor("#000000ff")}>
+            <rect x="-50" y="-50" width="100" height="100" fill="transparent" />
+            <path
+              d = "M -50 -6 L 50 -6 M -50 15 L 50 15"
+              stroke = "#000000ff"
+              stroke-width="2"
+            />
+            <ellipse rx="15" ry="9.5" cx="10" cy="10" transform="rotate(-26)" fill={noteColor}/>
+            <path
+              d = "M 25.75 4 L 25.75 -50"
+              stroke={noteColor}
+              stroke-width="2.5"
+            />
+          </svg> */}
+
+
+        </svg>
       </div>
 
     </div>
