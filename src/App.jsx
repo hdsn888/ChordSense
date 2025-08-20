@@ -6,12 +6,23 @@ import * as Tone from "tone";
 
 // sampler used for all chords
 const sampler = new Tone.Sampler({
-    urls: {"C4": "C4.mp3", "E4": "E4.mp3", "G4": "G4.mp3", "B4": "B4.mp3", 
-      "C5": "C5.mp3", "B5": "B5.mp3", "E5": "E5.mp3", "G5": "G5.mp3"},
-    release: 1,
-    baseUrl: "/",
+  urls: {"C4": "C4.mp3", "E4": "E4.mp3", "G4": "G4.mp3", "B4": "B4.mp3", 
+    "C5": "C5.mp3", "B5": "B5.mp3", "E5": "E5.mp3", "G5": "G5.mp3"},
+  release: 1,
+  baseUrl: "/",
 })
 sampler.toDestination();
+
+const YINTERVAL = 22.05; // distance of one whole-step (one ledger-line to the next)
+const notePositions = new Map([
+  ['C4', {cy: 66.375, xPath: 11.8, yPathStart: 63.35, yPathEnd: 5.35}],
+  ['D4', {cy: 55.35, xPath: 11.8, yPathStart: 52.325, yPathEnd: -5.675}],
+  ['E4', {cy: 44.325, xPath: 11.8, yPathStart: 41.3, yPathEnd: -16.7}],
+  ['G4', {cy: 22.275, xPath: 11.8, yPathStart: 19.25, yPathEnd: -38.75}],
+  ['B4', {cy: -0.225, xPath: -11.6, yPathStart: -1.025, yPathEnd: 59.025}],
+  ['C5', {cy: -10.8, xPath:-11.6, yPathStart: -10, yPathEnd: 48}]
+
+]);
 
 // chords are queried and fetched from backend
 const getChords = async() => {
@@ -57,6 +68,55 @@ const ChordButtons = ({chords, chord}) => {
       </div>
       
     </div>
+  );
+}
+
+const ChordDisplay = ({chords, chord}) => {
+  return (
+   <svg className = "w-full h-[300px] min-w-[400px] my-10 mx-auto block" viewBox = "-500 -100 1000 300">
+      <rect
+        x = "-500"
+        y = "-100"
+        width = "1000"
+        height="300"
+        fill = "#f6f6f6ff"
+        rx="15" 
+      />
+      <path d = " M -500 -44 L 500 -44 M -500 -22 L 500 -22 M -500 0 L 500 0 M -500 22 L 500 22 M -500 44 L 500 44"
+        stroke = "#000000ff"
+        strokeWidth = "1.5"
+      />
+
+      {chords.get(chord).notes.map((note, index) => (
+        <svg key = {note} className = "group" x={-250 + (index*100)} y="-100" width="100" height="300" viewBox="-50 -100 100 300" 
+      onClick={() => playNote(note)} >
+        <text className = "fill-black group-hover:fill-red-500" x = "-10" y = "150">{note}</text>
+        <rect x="-50" y="-100" width="100" height="200" fill="transparent" />
+        <ellipse className = "fill-black group-hover:fill-red-500" rx="14" ry="10.3" cx="0" cy={notePositions.get(note).cy} transform={`rotate(-28 0 ${notePositions.get(note).cy})`}/>
+        <path
+          className = "stroke-black group-hover:stroke-red-500"
+          d = {`M ${notePositions.get(note).xPath} ${notePositions.get(note).yPathStart} L ${notePositions.get(note).xPath} ${notePositions.get(note).yPathEnd}`}
+          strokeWidth="3"
+        />
+      </svg>
+      ))}
+
+      <svg className = "group" x = {-250 + chords.get(chord).notes.length*100} y="-100" width="100" height="300" viewBox="-50 -100 100 300" onClick = {() => playChord({chords, chord})} >
+        <text className = "fill-black group-hover:fill-red-500" x = "-10" y = "150">{chord}</text>
+        <rect x="-50" y="-100" width="100" height="200" fill="transparent" />
+        {chords.get(chord).notes.map((note, index) => (
+          <ellipse key = {note} className = "fill-black group-hover:fill-red-500" rx="14" ry="10.3" cx="0" cy={notePositions.get(note).cy} transform={`rotate(-28 0 ${notePositions.get(note).cy})`}/>
+        ))}
+        <path
+          className = "stroke-black group-hover:stroke-red-500"
+          d = {`M 11.8 ${notePositions.get(chords.get(chord).notes[0]).yPathStart} L 11.8 ${notePositions.get(chords.get(chord).notes[chords.get(chord).notes.length - 1]).yPathStart - 58}`}
+          strokeWidth="3"
+        />
+      </svg>
+      
+
+      
+    </svg>
   );
 }
 
@@ -118,6 +178,16 @@ const ChordDropdown = ({setIsShowing, setCurrChord, chords}) => {
   );
 }
 
+const Navigation = () => {
+  return (
+    <ul className="menu bg-base-200 lg:menu-horizontal rounded-box">
+      <li><a>Home</a></li>
+      <li><a>About</a></li>
+      <li><a>Contact</a></li>
+    </ul>
+  );
+}
+
 function MyButton({count, onClick}) {
   return (
     <button onClick = {e => { 
@@ -131,9 +201,9 @@ function MyButton({count, onClick}) {
 
 function Header() {
   return (
-    <div>
-      <h1 className = "object-scale-down m-4 text-7xl text-center">ChordSense</h1>
-      <h4 className = "text-center">Music theory explained simply</h4>
+    <div className = "object-scale-down text-center">
+      <h1 className = "m-2 text-2xl">ChordSense</h1>
+      <h4 className = "text-sm">Music theory explained simply</h4>
     </div>
   );
 }
@@ -143,8 +213,7 @@ export default function App() { // file can only have one default export
   const [isReady, setIsReady] = useState(false);
   const [isShowing, setIsShowing] = useState(false);
   const [currChord, setCurrChord] = useState(null);
-  const [noteColor, setNoteColor] = useState("#000000ff");
-
+  const [noteColor, setNoteColor] = useState("#060404ff");
 
   useEffect(() => {
     const fetchChords = async () => {
@@ -163,66 +232,25 @@ export default function App() { // file can only have one default export
 
   // props - information passed from its parent component
   return (
-    <div className = "grid grid-cols-8 gap-4 items-center content-center">
-
-      <div className = "col-span-2 col-start-4 place-items-center">
-        <Header />
-      </div>
-      <div className = "col-span-2 col-start-7">
-        <ul className="menu bg-base-200 lg:menu-horizontal rounded-box">
-          <li><a>Home</a></li>
-          <li><a>About</a></li>
-          <li><a>Contact</a></li>
-        </ul>
-      </div>
-      <div className = "col-start-4 col-span-2 m-10" >
-        {isReady && <RootDropdown setIsShowing = {setIsShowing} 
-        setCurrChord = {setCurrChord} chords = {chords}/> 
-        }
-      </div>
-      <div className = "col-start-4 col-span-4">
+    <div className = "min-h-screen flex flex-col bg-[#313945]">
+      <header className = "shadow-lg px-5 py-5 flex justify-between">
+          <div className = "max-w-4xl mx-auto flex justify-between justify-left items-center">
+            {/* <Header /> */}
+            <img src="Logo.png" className = "w-40 h-10"/>
+          </div>
+          <div className = "flex mx-auto justify-right items-center">
+            <Navigation/>
+          </div>
+      </header>
+      <main className = "flex-1 px-4 px-12">
+        <div className = "max-w-4xl mx-auto text-center">
+          {isReady && <RootDropdown setIsShowing = {setIsShowing} 
+          setCurrChord = {setCurrChord} chords = {chords}/>}
+          {/* {isShowing && currChord && <ChordButtons chords = {chords} chord = {currChord} />} */}
+          {isShowing && currChord && <ChordDisplay chords = {chords} chord = {currChord} /> }
+        </div>
        
-        {isShowing && currChord && <ChordButtons chords = {chords} chord = {currChord} />}
-        <svg width = "500" height = "200" viewBox = "-250 -100 500 200">
-          <rect
-            x = "-250"
-            y = "-100"
-            width = "500"
-            height="100"
-            fill = "#f6f6f6ff"
-          />
-          <path d = " M -250 -83 L 250 -83 M -250 -72 L 250 -72 M -250 -61 L 250 -61 M -250 -50 L 250 -50 M -250 -39 L 250 -39 "
-          stroke = "#000000ff"
-          />
-           <svg x="-250" y="-100" width="100" height="100" viewBox="-50 -50 100 100" 
-          onClick={() => playNote("A4")} onMouseEnter = {() => setNoteColor("#d02323ff")} onMouseLeave = {() => setNoteColor("#000000ff")}>
-            <rect x="-50" y="-50" width="100" height="100" fill="transparent" />
-            <ellipse rx="15" ry="9.5" cx="10" cy="10" transform="rotate(-26)" fill={noteColor}/>
-            <path
-              d = "M 25.75 4 L 25.75 -50"
-              stroke={noteColor}
-              stroke-width="2.5"
-            />
-          </svg>
-          {/* <svg x="100" y="100" width="100" height="100" viewBox="-50 -50 100 100" 
-          onClick={() => playNote("A4")} onMouseEnter = {() => setNoteColor("#d02323ff")} onMouseLeave = {() => setNoteColor("#000000ff")}>
-            <rect x="-50" y="-50" width="100" height="100" fill="transparent" />
-            <path
-              d = "M -50 -6 L 50 -6 M -50 15 L 50 15"
-              stroke = "#000000ff"
-              stroke-width="2"
-            />
-            <ellipse rx="15" ry="9.5" cx="10" cy="10" transform="rotate(-26)" fill={noteColor}/>
-            <path
-              d = "M 25.75 4 L 25.75 -50"
-              stroke={noteColor}
-              stroke-width="2.5"
-            />
-          </svg> */}
-
-
-        </svg>
-      </div>
+      </main>
 
     </div>
   );
