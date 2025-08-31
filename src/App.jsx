@@ -16,19 +16,46 @@ sampler.toDestination();
 const YINTERVAL = 22.05; // distance of one whole-step (one ledger-line to the next)
 const notePositions = new Map([
   ['C4', {cy: 66.375, xPath: 11.8, yPathStart: 63.35, yPathEnd: 5.35}],
+  ['C#4', {cy: 66.375, xPath: 11.8, yPathStart: 63.35, yPathEnd: 5.35}],
+  ['Db4',{cy: 55.35, xPath: 11.8, yPathStart: 52.325, yPathEnd: -5.675}],
   ['D4', {cy: 55.35, xPath: 11.8, yPathStart: 52.325, yPathEnd: -5.675}],
+  ['D#4', {cy: 55.35, xPath: 11.8, yPathStart: 52.325, yPathEnd: -5.675}],
+  ['Eb4', {cy: 44.325, xPath: 11.8, yPathStart: 41.3, yPathEnd: -16.7}],
   ['E4', {cy: 44.325, xPath: 11.8, yPathStart: 41.3, yPathEnd: -16.7}],
+  ['E#4', {cy: 44.325, xPath: 11.8, yPathStart: 41.3, yPathEnd: -16.7}],
+  ['F4', {cy: 33.3, xPath: 11.8, yPathStart: 30.05, yPathEnd: -27.725}],
   ['F#4', {cy: 33.3, xPath: 11.8, yPathStart: 30.05, yPathEnd: -27.725}],
+  ['Gb4', {cy: 22.275, xPath: 11.8, yPathStart: 19.25, yPathEnd: -38.75}],
   ['G4', {cy: 22.275, xPath: 11.8, yPathStart: 19.25, yPathEnd: -38.75}],
+  ['G#4', {cy: 22.275, xPath: 11.8, yPathStart: 19.25, yPathEnd: -38.75}],
+  ['Ab4', {cy: 11.25, xPath: 11.8, yPathStart: 8.225, yPathEnd: -49.775}],
   ['A4', {cy: 11.25, xPath: 11.8, yPathStart: 8.225, yPathEnd: -49.775}],
+  ['A#4', {cy: 11.25, xPath: 11.8, yPathStart: 8.225, yPathEnd: -49.775}],
+  ['Bb4', {cy: 0.225, xPath: -11.6, yPathStart: -1.025, yPathEnd: 59.025}],
   ['B4', {cy: 0.225, xPath: -11.6, yPathStart: -1.025, yPathEnd: 59.025}],
+  ['B#4', {cy: 0.225, xPath: -11.6, yPathStart: -1.025, yPathEnd: 59.025}],
   ['C5', {cy: -10.8, xPath:-11.6, yPathStart: -10, yPathEnd: 48}],
   ['C#5', {cy: -10.8, xPath:-11.6, yPathStart: -10, yPathEnd: 48}],
+  ['Db5', {cy: -21.825, xPath: -11.6, yPathStart: -21.025, yPathEnd: 36.975}],
   ['D5', {cy: -21.825, xPath: -11.6, yPathStart: -21.025, yPathEnd: 36.975}],
   ['D#5', {cy: -21.825, xPath: -11.6, yPathStart: -21.025, yPathEnd: 36.975}],
+  ['Eb5', {cy: -32.85, xPath: -11.6, yPathStart: -32.05, yPathEnd: 25.95}],
   ['E5', {cy: -32.85, xPath: -11.6, yPathStart: -32.05, yPathEnd: 25.95}],
+  ['E#5', {cy: -32.85, xPath: -11.6, yPathStart: -32.05, yPathEnd: 25.95}],
   ['F5', {cy: -43.875, xPath: -11.6, yPathStart: -43.075, yPathEnd: 14.925}],
   ['F#5', {cy: -43.875, xPath: -11.6, yPathStart: -43.075, yPathEnd: 14.925}],
+  ['Gb5', {cy: -54.9, xPath: -11.6, yPathStart: -54.1, yPathEnd: 3.9}],
+  ['G5', {cy: -54.9, xPath: -11.6, yPathStart: -54.1, yPathEnd: 3.9}],
+  ['G#5', {cy: -54.9, xPath: -11.6, yPathStart: -54.1, yPathEnd: 3.9}],
+  ['Ab5', {cy: -65.925, xPath: -11.6, yPathStart: -65.125, yPathEnd: -7.125}],
+  ['A5', {cy: -65.925, xPath: -11.6, yPathStart: -65.125, yPathEnd: -7.125}],
+  ['A#5', {cy: -65.925, xPath: -11.6, yPathStart: -65.125, yPathEnd: -7.125}],
+  
+
+
+
+
+
 
 
 
@@ -85,12 +112,12 @@ const ChordDisplay = ({chords, chord}) => {
   return (
    <div>
     <h2 className = "mx-auto mt-15 mb-5 text-3xl">{chord} Chord</h2>
-    <svg className = "w-full h-[300px] min-w-[400px] mx-auto block mb-20" viewBox = "-500 -100 1000 300">
+    <svg className = "w-full h-[300px] min-w-[400px] mx-auto block mb-20" viewBox = "-500 -200 1000 400">
       <rect
         x = "-500"
-        y = "-100"
+        y = "-200"
         width = "1000"
-        height="300"
+        height="400"
         fill = "#f6f6f6ff"
         rx="15" 
       />
@@ -100,7 +127,7 @@ const ChordDisplay = ({chords, chord}) => {
       />
 
       {chords.get(chord).notes.map((note, index) => (
-        <svg key = {note} className = "group" x={-250 + (index*100)} y="-100" width="100" height="300" viewBox="-50 -100 100 300" 
+        <svg key = {note} className = "group" x={-250 + (index*100)} y="-200" width="100" height="400" viewBox="-50 -200 100 400" 
       onClick={() => playNote(note)} >
         <text className = "fill-black group-hover:fill-red-500" x = "-5" y = "130">{1+index*2}</text>
         <text className = "text-lg font-bold fill-black group-hover:fill-red-500" x = "-10" y = "150">{note}</text>
@@ -116,7 +143,7 @@ const ChordDisplay = ({chords, chord}) => {
       </svg>
       ))}
 
-      <svg className = "group" x = {-250 + chords.get(chord).notes.length*100} y="-100" width="100" height="300" viewBox="-50 -100 100 300" onClick = {() => playChord({chords, chord})} >
+      <svg className = "group" x = {-250 + chords.get(chord).notes.length*100} y="-200" width="100" height="400" viewBox="-50 -200 100 400" onClick = {() => playChord({chords, chord})} >
         <text className = "text-lg font-bold fill-black group-hover:fill-red-500" x = "-10" y = "150">{chord}</text>
         <rect x="-50" y="-100" width="100" height="200" fill="transparent" />
         {chords.get(chord).notes.map((note, index) => (
@@ -138,7 +165,7 @@ const ChordDisplay = ({chords, chord}) => {
 }
 
 const LedgerLines = ({note}) => {
-  const ledgerLineNotes = ['C4', 'A5', 'B5', 'C6']
+  const ledgerLineNotes = ['C4', 'C#4', 'A5', 'Ab5', 'A#5', 'B5', 'B#5', 'Bb5', 'C6']
   const validLedger = ledgerLineNotes.includes(note);
   let d;
   if (!validLedger) return;
@@ -147,14 +174,18 @@ const LedgerLines = ({note}) => {
       d = "M -20 66 L 20 66";
       break;
     case 'A5':
+    case 'Ab5':
+    case 'A#5':
     case 'B5':
+    case 'B#5':
+    case 'Bb5':
       d = "M -20 -66 L 20 -66"
       break;
     case 'C6':
       d = "M -20 -66 L 20 -66 M -20 -88 L 20 -88"
       break;
   }
-  return <path className = "stroke-black" d = {d} strokeWidth = "1.5"/>
+  return <path className = "stroke-black group-hover:stroke-red-500" d = {d} strokeWidth = "1.5"/>
 }
 
 const Accidental = ({note}) => {
@@ -177,6 +208,20 @@ const Accidental = ({note}) => {
         />
       </>
     );
+  } else {
+    return (
+      <>
+        <polygon
+          className = "stroke-black fill-black group-hover:stroke-red-500 group-hover:fill-red-500"
+          points ={`-35,${notePositions.get(note).cy + 12.8} -35,${notePositions.get(note).cy - 37.2} -33,${notePositions.get(note).cy - 37.2} -33,${notePositions.get(note).cy  + 10.8}`}
+        />
+        <path 
+          className = "stroke-black fill-black group-hover:stroke-red-500 group-hover:fill-red-500" 
+          d = {`M -35 ${notePositions.get(note).cy - 11.2} C -17 ${notePositions.get(note).cy - 21.2} -15  ${notePositions.get(note).cy - 1.2} -35 ${notePositions.get(note).cy + 12.8} C -12  ${notePositions.get(note).cy - 21.2} -35  ${notePositions.get(note).cy - 7.2} -35  ${notePositions.get(note).cy - 9.2} Z`}
+          strokeWidth = "1"
+        />
+      </>
+    ); 
   }
 }
 
